@@ -1,5 +1,4 @@
 #include "charac.h"
-#include <curses.h>
 //TAD line
 
 #define CURR_LINE 0

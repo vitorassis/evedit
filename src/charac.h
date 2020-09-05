@@ -1,6 +1,5 @@
 //TAD charac
 
-#include <stdlib.h>
 #define CURR_CHAR 0
 #define FIRST_CHAR 1
 #define LAST_CHAR 2
