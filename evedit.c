@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN64
+#include "meuconio.h"
+#else
 #include "conio_linux.h"
-//#include "meuconio.h"
+#endif
 #include "src/line.h"
 #include "interface.c"
 
