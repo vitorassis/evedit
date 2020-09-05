@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #ifdef _WIN64
-#include "meuconio.h"
+#include "conio_win.h"
 #else
 #include "conio_linux.h"
 #endif
