@@ -38,6 +38,8 @@ dCharac* newDCharac(){
     dCharac* chars = (dCharac*)malloc(sizeof(dCharac));
     chars->curr = chars->first = chars->last = NULL;
     chars->size = 0;
+
+    return chars;
 }
 
 int isDCharacEmpty(dCharac *chars){

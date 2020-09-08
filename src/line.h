@@ -24,7 +24,7 @@ typedef struct dLine dLine;
 dLine* newDLine();
 void insertLine(dLine **lines, int mode); //AS LINHAS SEMPRE SÃO INSERIDAS VAZIAS
 line* getLine(dLine *lines, int mode);
-void moveLineTo(dLine *lines, int mode);
+void moveLineTo(dLine **lines, int mode);
 int isDLineEmpty(dLine *lines);
 void showLines(dLine* lines);
 //END dLine functions
@@ -32,6 +32,7 @@ void showLines(dLine* lines);
 //START line functions
 line* newLine();
 void insertChar(line** _line, char character, int mode);
+char removeChar(line** _line, int mode);
 void showLine(line *_line);
 //END line functions
 
@@ -51,6 +52,7 @@ dLine* newDLine(){
 }
 
 void insertLine(dLine **lines, int mode){
+    int pos = 0;
     line *_line = newLine();
     if(isDLineEmpty(*lines))
         (*lines)->first = (*lines)->curr = (*lines)->last = _line;
@@ -94,6 +96,7 @@ void insertLine(dLine **lines, int mode){
         }
     
     (*lines)->size ++;
+    (*lines)->curr = _line;
 }
 
 line* getLine(dLine *lines, int mode){
@@ -121,25 +124,25 @@ line* getLine(dLine *lines, int mode){
     return _line;
 }
 
-void moveLineTo(dLine *lines, int mode){
-    if(!isDLineEmpty(lines))
+void moveLineTo(dLine **lines, int mode){
+    if(!isDLineEmpty(*lines))
         switch (mode) {
             case CURR_LINE:
-                lines->curr = lines->curr;
+                (*lines)->curr = (*lines)->curr;
                 break;
             case FIRST_LINE:
-                lines->curr = lines->first;
+                (*lines)->curr = (*lines)->first;
                 break;
             case LAST_LINE:
-                lines->curr = lines->last;
+                (*lines)->curr = (*lines)->last;
                 break;
             case NEXT_LINE:
-                if(lines->curr != NULL)
-                    lines->curr = lines->curr->next;
+                if((*lines)->curr != NULL)
+                    (*lines)->curr = (*lines)->curr->next;
                 break;
             case PREV_LINE:
-                if(lines->curr != NULL)
-                    lines->curr = lines->curr->prev;
+                if((*lines)->curr != NULL)
+                    (*lines)->curr = (*lines)->curr->prev;
         }
 }
 
@@ -151,17 +154,17 @@ line* newLine(){
     line* _line = (line*)malloc(sizeof(line));
     _line->prev = _line->next = NULL;
     _line->pos = 0;
-    _line->chars = NULL;
+    _line->chars = newDCharac();
     
     return _line;
 }
 
 void insertChar(line **_line, char character, int mode){
+    int pos = 0;
     charac* _charac = newCharac();
     _charac->value = character;
 
     if(isDCharacEmpty((*_line)->chars)){
-        (*_line)->chars = newDCharac();
         (*_line)->chars->first = (*_line)->chars->last = (*_line)->chars->curr = _charac;
     }else
         switch (mode) {
@@ -176,25 +179,40 @@ void insertChar(line **_line, char character, int mode){
                 (*_line)->chars->last = _charac;
                 break;
             case NEXT_CHAR:
-                _charac->next = (*_line)->chars->curr->next;
-                (*_line)->chars->curr->next->prev = _charac;
-                _charac->prev = (*_line)->chars->curr;
-                (*_line)->chars->curr->next = _charac;
+                if((*_line)->chars->curr->next != NULL){
+                    _charac->next = (*_line)->chars->curr->next;
+                    (*_line)->chars->curr->next->prev = _charac;
+                    _charac->prev = (*_line)->chars->curr;
+                    (*_line)->chars->curr->next = _charac;
+                }else{
+                    _charac->next = NULL;
+                    (*_line)->chars->last = _charac;
+                    _charac->prev = (*_line)->chars->curr;
+                    (*_line)->chars->curr->next = _charac;
+                }
                 break;
             case PREV_CHAR:
-                _charac->prev = (*_line)->chars->curr->prev;
-                (*_line)->chars->curr->prev->next = _charac;
-                _charac->next = (*_line)->chars->curr;
-                (*_line)->chars->curr->prev = _charac;
+                if((*_line)->chars->curr->prev != NULL){
+                    _charac->prev = (*_line)->chars->curr->prev;
+                    (*_line)->chars->curr->prev->next = _charac;
+                    _charac->next = (*_line)->chars->curr;
+                    (*_line)->chars->curr->prev = _charac;
+                }else{
+                    _charac->prev = (*_line)->chars->curr->prev;
+                    (*_line)->chars->first = _charac;
+                    _charac->next = (*_line)->chars->curr;
+                    (*_line)->chars->curr->prev = _charac;
+                }
         }
     (*_line)->chars->size++;
+    (*_line)->chars->curr = _charac;
 }
 
 void showLines(dLine *lines){
-    moveLineTo(lines, FIRST_LINE);
+    moveLineTo(&lines, FIRST_LINE);
     while(getLine(lines, CURR_LINE) != NULL){
         showLine(getLine(lines, CURR_LINE));
-        moveLineTo(lines, NEXT_LINE);
+        moveLineTo(&lines, NEXT_LINE);
         printw("\n");
     }
 
@@ -205,5 +223,16 @@ void showLine(line *_line){
     while(_line->chars->curr != NULL){
         printw("%c", _line->chars->curr->value);
         _line->chars->curr = _line->chars->curr->next;
+    }
+}
+
+char removeChar(dLine **_lines, int mode){
+    if(isDCharacEmpty((*_lines)->chars)) 
+        return 0;
+
+    switch (mode) {
+        case CURR_CHAR:
+            
+            break;
     }
 }

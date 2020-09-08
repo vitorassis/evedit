@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #ifndef __NCURSES_H
 #include <curses.h>
 #endif
@@ -55,6 +54,7 @@ int initconio(void) {
 	bkgd(COLOR_PAIR(cur_pair));
 	color_set(cur_pair,NULL);
 	attr_off(A_BOLD,NULL);
+	noecho();
 
 	return 0;
 }
@@ -129,7 +129,7 @@ int textbackground(short color) {
 }
 
 int gotoxy(int x, int y) {
-	wmove(win, x-1, y-1);
+	wmove(win, y-1, x-1);
 	refresh();
 
 	return 0;
@@ -138,16 +138,14 @@ int gotoxy(int x, int y) {
 int wherex(void) {
 	int x, y;
 
-	getyx(stdscr,x,y);
-
+	x = getcurx(win);
 	return x + 1;
 }
 
 int wherey(void) {
 	int x, y;
 
-	getyx(stdscr,x,y);
-
+	y = getcury(win);
 	return y + 1;
 }
 

@@ -1,36 +1,44 @@
+#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 #ifdef _WIN64
 #include "conio_win.h"
 #else
 #include "conio_linux.h"
 #endif
+
 #include "src/line.h"
 #include "interface.c"
 
 int main(){
+    char tecla;
+    dLine* lines;
+    int mode;
+
     initconio();
     
-    //frame();
+    frame();
 
-    dLine* lines = newDLine();
-    insertLine(&lines, CURR_LINE);
-    insertChar(&lines->curr, 'a', LAST_CHAR);
-    insertChar(&lines->curr, 'b', LAST_CHAR);
-    insertChar(&lines->curr, 'c', LAST_CHAR);
+    lines = newDLine();
+    insertLine(&lines, FIRST_LINE);
 
-    insertLine(&lines, NEXT_LINE);
-    insertChar(&lines->last, 'd', LAST_CHAR);
-    insertChar(&lines->last, 'e', LAST_CHAR);
-
-    insertChar(&lines->first, 'f', LAST_CHAR);
-    insertChar(&lines->first, 'g', LAST_CHAR);
-
-    insertLine(&lines, NEXT_LINE);
-    insertChar(&lines->curr->next, 'h', FIRST_CHAR);
-
-    showLines(lines);
-
+    do{
+        showEditor(&lines);
+        tecla = getch();
+        gotoxy(15, 15);printw("DEBUG: %d", tecla);
+        switch (tecla) {
+            case 13:
+            case 10:
+                insertLine(&lines, NEXT_LINE);
+                break;
+            case 127:
+                removeChar(&lines->curr, CURR_CHAR);
+                break;
+            default:
+                insertChar(&lines->curr, tecla, NEXT_CHAR);
+        }
+    }while(tecla != 27);
 
     getch();
     endwin();
