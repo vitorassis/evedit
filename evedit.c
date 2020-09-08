@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _WIN64
-#include "conio_win.h"
+#ifdef __linux__ 
+    #include "conio_linux.h"
+#elif _WIN32
+    #include "conio_win.h"
 #else
-#include "conio_linux.h"
+
 #endif
 
 #include "src/line.h"
@@ -26,14 +28,13 @@ int main(){
     do{
         showEditor(&lines);
         tecla = getch();
-        gotoxy(15, 15);printw("DEBUG: %d", tecla);
         switch (tecla) {
             case 13:
             case 10:
                 insertLine(&lines, NEXT_LINE);
                 break;
             case 127:
-                removeChar(&lines->curr, CURR_CHAR);
+                removeChar(&lines, CURR_CHAR);
                 break;
             default:
                 insertChar(&lines->curr, tecla, NEXT_CHAR);

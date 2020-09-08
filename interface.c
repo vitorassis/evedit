@@ -1,4 +1,3 @@
-#include <curses.h>
 #define WIDTH 81
 #define HEIGTH 24
 #define FRAME "#"
@@ -38,22 +37,6 @@ void frame(){
     textcolor(15);
 }
 
-void showCursor(dLine *lines){
-    int x = 0, y=0;
-    
-    if(lines != NULL && lines->curr != NULL){
-        y = lines->curr->pos;
-        if(lines->curr->chars != NULL && lines->curr->chars->curr != NULL){
-            x = lines->curr->chars->curr->pos;
-        }else {
-            x = 0;
-        }
-    }else{
-        y=0;
-    }
-
-    gotoxy(x+MIN_XCURSOR, y+MIN_YCURSOR);
-}
 
 void showEditor(dLine **lines){
     line* currentLine = (*lines)->curr;
@@ -62,11 +45,11 @@ void showEditor(dLine **lines){
     int y=MIN_YCURSOR;
     int curX=x, curY=y;
 
-    for(x; x<MAX_XCURSOR; x++)
-        for(y; y<MAX_YCURSOR; y++){
+    for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
+        for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
             gotoxy(x, y);printw(" ");
         }
-
+    }
     (*lines)->curr = (*lines)->first;
     (*lines)->curr->chars->curr = (*lines)->curr->chars->first;
 

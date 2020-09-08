@@ -32,7 +32,7 @@ void showLines(dLine* lines);
 //START line functions
 line* newLine();
 void insertChar(line** _line, char character, int mode);
-char removeChar(line** _line, int mode);
+char removeChar(dLine** lines, int mode);
 void showLine(line *_line);
 //END line functions
 
@@ -227,12 +227,38 @@ void showLine(line *_line){
 }
 
 char removeChar(dLine **_lines, int mode){
-    if(isDCharacEmpty((*_lines)->chars)) 
-        return 0;
+    charac *aux;
+    line *lineaux;
 
     switch (mode) {
         case CURR_CHAR:
-            
+
+            /*TODO:
+                Teste se linha está fazia e, se esitver, remover a linha
+            */
+
+            aux = (*_lines)->curr->chars->curr;
+
+            if((*_lines)->curr->chars->size == 1){ //SE CARAC É O ÚNICO
+                (*_lines)->curr->chars = newDCharac();
+                (*_lines)->curr->chars++;
+            }else if(aux == (*_lines)->curr->chars->first){ //SE O CARAC É O PRIMEIRO
+                aux->next->prev = NULL;
+                (*_lines)->curr->chars->first = aux->next;
+                (*_lines)->curr->chars->curr = aux->next;
+            }else if(aux == (*_lines)->curr->chars->last){ //SE O CARAC É O ÚLTIMO
+                aux->prev->next = NULL;
+                (*_lines)->curr->chars->last = aux->prev;
+                (*_lines)->curr->chars->curr = aux->prev;
+            }else{
+                aux->prev->next = aux->next;
+                aux->next->prev = aux->prev;
+                (*_lines)->curr->chars->curr = aux->next;
+            }
             break;
     }
+
+    (*_lines)->curr->chars->size--;
+
+    free(aux);
 }
