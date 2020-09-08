@@ -23,6 +23,7 @@ typedef struct dLine dLine;
 //START dLine functions
 dLine* newDLine();
 void insertLine(dLine **lines, int mode); //AS LINHAS SEMPRE SÃO INSERIDAS VAZIAS
+int removeLine(dLine **lines, int mode);
 line* getLine(dLine *lines, int mode);
 void moveLineTo(dLine **lines, int mode);
 int isDLineEmpty(dLine *lines);
@@ -97,6 +98,36 @@ void insertLine(dLine **lines, int mode){
     
     (*lines)->size ++;
     (*lines)->curr = _line;
+}
+
+int removeLine(dLine **lines, int mode){
+    line *aux;
+
+    if(isDLineEmpty(*lines))
+        return 0;
+
+    switch (mode) {
+        case CURR_LINE:
+            aux = (*lines)->curr;
+            if((*lines)->size == 1)
+                (*lines)->curr = (*lines)->first = (*lines)->last = NULL;
+
+            else if(aux == (*lines)->first){
+                aux->next->prev = NULL;
+                (*lines)->first = (*lines)->curr = aux->next;
+            }else if(aux == (*lines)->last){
+                (*lines)->last = (*lines)->curr = aux->prev;
+                aux->prev->next = NULL;
+            }else{
+                aux->prev->next = aux->next;
+                (*lines)->curr = aux->next->prev = aux->prev;
+            }
+            break;
+    }
+
+    free(aux);
+    (*lines)->size--;
+    return 1;
 }
 
 line* getLine(dLine *lines, int mode){
@@ -228,14 +259,12 @@ void showLine(line *_line){
 
 char removeChar(dLine **_lines, int mode){
     charac *aux;
-    line *lineaux;
 
     switch (mode) {
         case CURR_CHAR:
 
-            /*TODO:
-                Teste se linha está fazia e, se esitver, remover a linha
-            */
+            if((*_lines)->curr->chars->size == 0)
+                return removeLine(_lines, CURR_LINE);
 
             aux = (*_lines)->curr->chars->curr;
 
