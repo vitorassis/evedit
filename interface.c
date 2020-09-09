@@ -1,3 +1,4 @@
+#include <curses.h>
 #define WIDTH 81
 #define HEIGTH 24
 #define FRAME "#"
@@ -38,47 +39,55 @@ void frame(){
 }
 
 
-void showEditor(dLine **lines){
-    line* currentLine = (*lines)->curr;
-    charac* currentChar = (*lines)->curr->chars->curr;
-    int x=MIN_XCURSOR;
-    int y=MIN_YCURSOR;
+void showEditor(dLine *lines, int top){
+    line* currentLine;
+    charac* currentChar;
+    int lastX, x=lastX=MIN_XCURSOR;
+    int lastY, y=lastY=MIN_YCURSOR;
     int curX=x, curY=y;
+    
+    int i=0;
+    while(i<lines->size  && i++ < top) 
+        lines->curr = lines->curr->next;
+
+    currentLine = lines->curr;
+    currentChar = lines->curr->chars->curr;
+
+    lines->curr = lines->first;
+    lines->curr->chars->curr = lines->curr->chars->first;
 
     for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
-        for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
-            gotoxy(x, y);printw(" ");
-        }
-    }
-    (*lines)->curr = (*lines)->first;
-    (*lines)->curr->chars->curr = (*lines)->curr->chars->first;
-
-    for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
-        if((*lines)->curr != NULL){
+        if(lines->curr != NULL){
             for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
-                if((*lines)->curr->chars->curr != NULL){
-                    if(currentLine == (*lines)->curr && currentChar == (*lines)->curr->chars->curr){                             
+                if(lines->curr->chars->curr != NULL){
+                    if(currentLine == lines->curr && currentChar == lines->curr->chars->curr){                             
                         curX = x+1; 
                         curY = y;
                     }
-                    gotoxy(x, y);printw("%c", (*lines)->curr->chars->curr->value);
-                    if((*lines)->curr->chars->curr->next != NULL)
-                        (*lines)->curr->chars->curr = (*lines)->curr->chars->curr->next;
+                    gotoxy(x, y);printw("%c", lines->curr->chars->curr->value);
+                    lastX = x;
+                    lastY = y;
+                    if(lines->curr->chars->curr->next != NULL)
+                        lines->curr->chars->curr = lines->curr->chars->curr->next;
                     else 
                         x = MAX_XCURSOR;
-                }else 
-                    x = MAX_XCURSOR;
+                }else {
+                    gotoxy(x, y);printw(" ");
+                }
             }
-            if((*lines)->curr->chars->curr == NULL || (*lines)->curr->chars->curr->next == NULL){
-                if((*lines)->curr->next != NULL){
-                    (*lines)->curr = (*lines)->curr->next;
-                    (*lines)->curr->chars->curr = (*lines)->curr->chars->first;
+            if(lines->curr->chars->curr == NULL || lines->curr->chars->curr->next == NULL){
+                if(lines->curr->next != NULL){
+                    lines->curr = lines->curr->next;
+                    lines->curr->chars->curr = lines->curr->chars->first;
                 }else
                     y = MAX_YCURSOR;
             }
         }
         else
             y = MAX_YCURSOR;
+    }
+    if(curX == lastX+1 && curY == lastY){
+        gotoxy(lastX+1, lastY);printw(" ");
     }
 
     gotoxy(curX, curY);

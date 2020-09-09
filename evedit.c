@@ -14,6 +14,7 @@
 #include "interface.c"
 
 int main(){
+    int top=0;
     char tecla;
     dLine* lines;
     int mode;
@@ -26,7 +27,6 @@ int main(){
     insertLine(&lines, FIRST_LINE);
 
     do{
-        showEditor(&lines);
         tecla = getch();
         switch (tecla) {
             case 13:
@@ -40,6 +40,7 @@ int main(){
             default:
                 insertChar(&lines->curr, tecla, NEXT_CHAR);
         }
+        showEditor(lines, top);
     }while(tecla != 27);
 
     getch();
