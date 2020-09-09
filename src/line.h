@@ -103,16 +103,14 @@ void insertLine(dLine **lines, int mode){
 int removeLine(dLine **lines, int mode){
     line *aux;
 
-    if(isDLineEmpty(*lines))
+    if((*lines)->size < 2)
         return 0;
 
     switch (mode) {
         case CURR_LINE:
             aux = (*lines)->curr;
-            if((*lines)->size == 1)
-                (*lines)->curr = (*lines)->first = (*lines)->last = NULL;
 
-            else if(aux == (*lines)->first){
+            if(aux == (*lines)->first){
                 aux->next->prev = NULL;
                 (*lines)->first = (*lines)->curr = aux->next;
             }else if(aux == (*lines)->last){
@@ -270,7 +268,7 @@ char removeChar(dLine **_lines, int mode){
 
             if((*_lines)->curr->chars->size == 1){ //SE CARAC É O ÚNICO
                 (*_lines)->curr->chars = newDCharac();
-                (*_lines)->curr->chars++;
+                (*_lines)->curr->chars->size++;
             }else if(aux == (*_lines)->curr->chars->first){ //SE O CARAC É O PRIMEIRO
                 aux->next->prev = NULL;
                 (*_lines)->curr->chars->first = aux->next;
