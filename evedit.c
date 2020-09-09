@@ -34,6 +34,7 @@ int main(){
                 insertLine(&lines, NEXT_LINE);
                 break;
             case 127:
+            case 8:
                 removeChar(&lines, CURR_CHAR);
                 break;
             default:
