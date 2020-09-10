@@ -31,7 +31,7 @@ void frame(){
 
     textcolor(9);
     gotoxy(5, HEIGTH-1);
-    printw("ESC - Fechar   ");
+    printw("F4 - Fechar   ");
     printw("F1 - Abrir   ");
     printw("F2 - Salvar   ");
     printw("F3 - Procurar");
@@ -39,30 +39,34 @@ void frame(){
 }
 
 
-void showEditor(dLine *lines, int top){
+void showEditor(dLine *lines, int top, int **curX, int **curY, int typed){
     line* currentLine;
     charac* currentChar;
     int lastX, x=lastX=MIN_XCURSOR;
     int lastY, y=lastY=MIN_YCURSOR;
-    int curX=x, curY=y;
-    
-    int i=0;
-    while(i<lines->size  && i++ < top) 
-        lines->curr = lines->curr->next;
 
+    int i=0;
     currentLine = lines->curr;
     currentChar = lines->curr->chars->curr;
 
     lines->curr = lines->first;
+
+    gotoxy(25, 22);printw("TOP: %d", top);
+    while(lines->curr->next != NULL && i++ < top) 
+        lines->curr = lines->curr->next;
+
+    
+
+    // lines->curr = lines->first;
     lines->curr->chars->curr = lines->curr->chars->first;
 
     for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
         if(lines->curr != NULL){
             for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
                 if(lines->curr->chars->curr != NULL){
-                    if(currentLine == lines->curr && currentChar == lines->curr->chars->curr){                             
-                        curX = x+1; 
-                        curY = y;
+                    if(typed && currentLine == lines->curr && currentChar == lines->curr->chars->curr){                             
+                        **curX = x+1; 
+                        **curY = y;
                     }
                     gotoxy(x, y);printw("%c", lines->curr->chars->curr->value);
                     lastX = x;
@@ -70,7 +74,7 @@ void showEditor(dLine *lines, int top){
                     if(lines->curr->chars->curr->next != NULL)
                         lines->curr->chars->curr = lines->curr->chars->curr->next;
                     else 
-                        x = MAX_XCURSOR;
+                       x = MAX_XCURSOR;
                 }else {
                     gotoxy(x, y);printw(" ");
                 }
@@ -86,9 +90,19 @@ void showEditor(dLine *lines, int top){
         else
             y = MAX_YCURSOR;
     }
-    if(curX == lastX+1 && curY == lastY){
+    if(**curX == lastX+1 && **curY == lastY){
         gotoxy(lastX+1, lastY);printw(" ");
     }
 
-    gotoxy(curX, curY);
+    gotoxy(**curX, **curY);
+}
+
+void clearEditor(){
+    int x, y;
+
+    for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
+        for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
+            gotoxy(x, y);printw(" ");
+        }
+    }
 }
