@@ -1,8 +1,16 @@
 #include <curses.h>
+#ifdef __linux__ 
+    #include "conio_linux.h"
+#elif _WIN32
+    #include "conio_win.h"
+#endif
+
 #define WIDTH 81
 #define HEIGTH 24
 #define FRAME "#"
 
+#define SETCUR_PREV -1
+#define SETCUR_NEXT 1
 
 #define MIN_XCURSOR 2
 #define MAX_XCURSOR WIDTH-2
@@ -51,7 +59,7 @@ void showEditor(dLine *lines, int top, int **curX, int **curY, int typed){
 
     lines->curr = lines->first;
 
-    gotoxy(25, 22);printw("TOP: %d", top);
+    // gotoxy(25, 22);printw("TOP: %d", top);
     while(lines->curr->next != NULL && i++ < top) 
         lines->curr = lines->curr->next;
 
@@ -105,4 +113,34 @@ void clearEditor(){
             gotoxy(x, y);printw(" ");
         }
     }
+}
+
+void setXCursor(dLine **lines, int **curX, int **curY, int mode){
+    switch (mode) {
+        case SETCUR_PREV:
+            if(!isDCharacEmpty((*lines)->curr->chars) && 
+            (*lines)->curr->chars->curr != (*lines)->curr->chars->first){
+              
+                gotoxy(15, 22);printw("Prev char: %c", (*lines)->curr->chars->curr->prev->value);
+                (*lines)->curr->chars->curr = (*lines)->curr->chars->curr->prev;
+                gotoxy(15, 23);printw("Curr char: %c", (*lines)->curr->chars->curr->value);
+                gotoxy(40, 22);printw("curX: %u", (**curX)++);
+                // if((**curX) <= MIN_XCURSOR){
+                //     (**curX) = MAX_XCURSOR;
+                //     (**curY)--;
+                // }else 
+                //     (**curX)--;
+            }else
+                if((*lines)->curr->prev != NULL){
+                    (*lines)->curr = (*lines)->curr->prev;
+                    (*lines)->curr->chars->curr = (*lines)->curr->chars->last;
+                }
+        break;
+        case SETCUR_NEXT:
+        break;
+    }
+}
+
+void setYCursor(dLine **lines, int **curX, int **curY, int mode){
+
 }
