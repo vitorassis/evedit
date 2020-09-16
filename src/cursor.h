@@ -3,6 +3,6 @@
 struct sCursor{
     line *cLine, *top;
     charac *cCharac;
-    int curX, cur;
+    int curX, curY;
 };
 typedef struct sCursor sCursor;
