@@ -1,5 +1,5 @@
 #include <curses.h>
-void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, int **typed){
+void triggerKey(dLine **lines, char tecla, int **exit, int **typed){
     switch (tecla) {
         case 27:    //TECLAS ESPECIAIS LINUX
             switch (getch()) {
@@ -20,16 +20,15 @@ void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, i
                             //pgup func
                         break;
                         case 66: //SETA P BAIXO
-                            setYCursor(lines, curX, curY, SETCUR_NEXT);
+                            setYCursor(lines, SETCUR_NEXT);
                         break;
                         case 65: //SETA P CIMA
-                            setYCursor(lines, curX, curY, SETCUR_PREV);
+                            setYCursor(lines, SETCUR_PREV);
                         break;
                         case 68: //SETA P ESQUERDA
-                            gotoxy(1, 22);printw("s: %d", (*curY)++);
-                            setXCursor(lines, curX, curY, SETCUR_PREV);
+                            setXCursor(lines, SETCUR_PREV);
                     }
-                    **typed = 0;
+                    **typed = 1;
                 break;               
                 case 79:    //FN KEYS
                     switch (getch()) {
@@ -40,14 +39,13 @@ void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, i
                     
                 break;             
             }
-            **typed = 0;
         break;
         case 10:
             insertLine(lines, NEXT_LINE);
             **typed = 1;
         break;
         case 127:
-            removeChar(lines, CURR_CHAR);
+            removeChar(lines, PREV_CHAR);
             **typed = 1;
         break;
         default:

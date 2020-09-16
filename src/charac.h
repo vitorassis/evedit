@@ -7,22 +7,10 @@
 #define PREV_CHAR 4
 
 struct charac{
-    int pos;
     char value;
     struct charac *prev, *next; 
 };
 typedef struct charac charac;
-
-struct dCharac{
-    charac *first, *last, *curr;
-    int size;
-};
-typedef struct dCharac dCharac;
-
-//START dCharac functions
-dCharac* newDCharac();
-int isDCharacEmpty(dCharac *chars);
-//END dCharac functions
 
 //START charac functions
 charac* newCharac();
@@ -34,22 +22,14 @@ charac* newCharac();
 
 */
 
-dCharac* newDCharac(){
-    dCharac* chars = (dCharac*)malloc(sizeof(dCharac));
-    chars->curr = chars->first = chars->last = NULL;
-    chars->size = 0;
-
-    return chars;
-}
-
-int isDCharacEmpty(dCharac *chars){
-    return chars == NULL || chars->size == 0;
+int isLineEmpty(charac *chars){
+    return chars == NULL;
 }
 
 charac *newCharac(){
     charac *_char = (charac*)malloc(sizeof(charac));
     _char->next = _char->prev = NULL;
-    _char->pos = _char->value = 0;
+    _char->value = 0;
 
     return _char;
 }

@@ -23,7 +23,7 @@ void frame(){
     int i=1;
 
     textcolor(4);
-    gotoxy(38, 2);printw("evedit");
+    gotoxy(38, 2);printw("evedit v"); printw(VERSION)
     textcolor(10);
 
     for(i; i<WIDTH; i++){
@@ -47,34 +47,78 @@ void frame(){
 }
 
 
-void showEditor(dLine *lines, int top, int **curX, int **curY, int typed){
-    line* currentLine;
-    charac* currentChar;
-    int lastX, x=lastX=MIN_XCURSOR;
-    int lastY, y=lastY=MIN_YCURSOR;
+void showEditor(dLine *lines, int typed){
+    // line* currentLine;
+    // charac* currentChar;
+    // int lastX, x=lastX=MIN_XCURSOR;
+    // int lastY, y=lastY=MIN_YCURSOR;
+    // int curX = x, curY = y;
 
-    int i=0;
-    currentLine = lines->curr;
-    currentChar = lines->curr->chars->curr;
-
-    lines->curr = lines->first;
-
-    // gotoxy(25, 22);printw("TOP: %d", top);
-    while(lines->curr->next != NULL && i++ < top) 
-        lines->curr = lines->curr->next;
-
-    
+    // currentLine = lines->curr;
+    // currentChar = lines->curr->chars->curr;
 
     // lines->curr = lines->first;
+    // lines->curr->chars->curr = lines->curr->chars->first;
+
+    // lines->curr->chars->curr = lines->curr->chars->first;
+
+    // for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
+    //     if(lines->curr != NULL){
+    //         for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
+    //             if(lines->curr->chars->curr != NULL){
+    //                 if(typed && currentLine == lines->curr && currentChar == lines->curr->chars->curr){                             
+    //                     curX = x+1; 
+    //                     curY = y;
+    //                 }
+    //                 gotoxy(x, y);printw("%c", lines->curr->chars->curr->value);
+    //                 lastX = x;
+    //                 lastY = y;
+    //                 if(lines->curr->chars->curr->next != NULL)
+    //                     lines->curr->chars->curr = lines->curr->chars->curr->next;
+    //                 else 
+    //                    x = MAX_XCURSOR;
+    //             }else {
+    //                 gotoxy(x, y);printw(" ");
+    //             }
+    //         }
+    //         if(lines->curr->chars->curr == NULL || lines->curr->chars->curr->next == NULL){
+    //             if(lines->curr->next != NULL){
+    //                 lines->curr = lines->curr->next;
+    //                 lines->curr->chars->curr = lines->curr->chars->first;
+    //             }else
+    //                 y = MAX_YCURSOR;
+    //         }
+    //     }
+    //     else
+    //         y = MAX_YCURSOR;
+    // }
+    // for(y = lastY; y < MAX_YCURSOR && y < lastY+1; y++)
+    //     for(x = y==lastY ? lastX+1 : MIN_XCURSOR; x < MAX_XCURSOR; x++){
+    //         gotoxy(x,y);printw(" ");
+    //     }
+
+    // gotoxy(curX, curY);
+
+    // lines->curr = currentLine;
+    // lines->curr->chars->curr = currentChar;
+
+    lines->aCurr = lines->curr;
+    lines->aCurr->chars->aCurr = lines->curr->chars->curr;
+    int lastX, x=lastX=MIN_XCURSOR;
+    int lastY, y=lastY=MIN_YCURSOR;
+    int curX = x, curY = y;
+
+    lines->curr = lines->first;
     lines->curr->chars->curr = lines->curr->chars->first;
+
 
     for(y=MIN_YCURSOR; y<MAX_YCURSOR; y++){
         if(lines->curr != NULL){
             for(x=MIN_XCURSOR; x<MAX_XCURSOR; x++){
                 if(lines->curr->chars->curr != NULL){
-                    if(typed && currentLine == lines->curr && currentChar == lines->curr->chars->curr){                             
-                        **curX = x+1; 
-                        **curY = y;
+                    if(typed && lines->aCurr->chars->aCurr == lines->curr->chars->curr){                             
+                        curX = x; 
+                        curY = y;
                     }
                     gotoxy(x, y);printw("%c", lines->curr->chars->curr->value);
                     lastX = x;
@@ -98,11 +142,17 @@ void showEditor(dLine *lines, int top, int **curX, int **curY, int typed){
         else
             y = MAX_YCURSOR;
     }
-    if(**curX == lastX+1 && **curY == lastY){
-        gotoxy(lastX+1, lastY);printw(" ");
-    }
+    for(y = lastY; y < MAX_YCURSOR && y < lastY+1; y++)
+        for(x = y==lastY ? lastX : MIN_XCURSOR; x < MAX_XCURSOR; x++){
+            gotoxy(x,y);printw(" ");
+        }
+    
 
-    gotoxy(**curX, **curY);
+    gotoxy(curX, curY);
+
+    lines->curr = lines->aCurr;
+    lines->curr->chars->curr = lines->aCurr->chars->aCurr;
+
 }
 
 void clearEditor(){
@@ -115,21 +165,12 @@ void clearEditor(){
     }
 }
 
-void setXCursor(dLine **lines, int **curX, int **curY, int mode){
+void setXCursor(dLine **lines, int mode){
     switch (mode) {
         case SETCUR_PREV:
             if(!isDCharacEmpty((*lines)->curr->chars) && 
-            (*lines)->curr->chars->curr != (*lines)->curr->chars->first){
-              
-                gotoxy(15, 22);printw("Prev char: %c", (*lines)->curr->chars->curr->prev->value);
+            (*lines)->curr->chars->curr != NULL){
                 (*lines)->curr->chars->curr = (*lines)->curr->chars->curr->prev;
-                gotoxy(15, 23);printw("Curr char: %c", (*lines)->curr->chars->curr->value);
-                gotoxy(40, 22);printw("curX: %u", (**curX)++);
-                // if((**curX) <= MIN_XCURSOR){
-                //     (**curX) = MAX_XCURSOR;
-                //     (**curY)--;
-                // }else 
-                //     (**curX)--;
             }else
                 if((*lines)->curr->prev != NULL){
                     (*lines)->curr = (*lines)->curr->prev;
@@ -139,8 +180,10 @@ void setXCursor(dLine **lines, int **curX, int **curY, int mode){
         case SETCUR_NEXT:
         break;
     }
+
+    gotoxy(25,22);printw("Curr: %10u", (*lines)->curr->chars->curr);
 }
 
-void setYCursor(dLine **lines, int **curX, int **curY, int mode){
+void setYCursor(dLine **lines, int mode){
 
 }

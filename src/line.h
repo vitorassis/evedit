@@ -1,27 +1,13 @@
 #include "charac.h"
 //TAD line
 
-#define CURR_LINE 0
-#define FIRST_LINE 1
-#define LAST_LINE 2
-#define NEXT_LINE 3
-#define PREV_LINE 4
-
 struct line{
-    int pos;
     struct line *prev, *next;
-    dCharac* chars;
+    charac *chars;
 };
 typedef struct line line;
 
-struct dLine{
-    line *first, *last, *curr;
-    int size;
-};
-typedef struct dLine dLine;
-
 //START dLine functions
-dLine* newDLine();
 void insertLine(dLine **lines, int mode); //AS LINHAS SEMPRE SÃO INSERIDAS VAZIAS
 int removeLine(dLine **lines, int mode);
 line* getLine(dLine *lines, int mode);
@@ -43,14 +29,6 @@ void showLine(line *_line);
 ====START FUNCTIONS====
 
 */
-
-dLine* newDLine(){
-    dLine* lines = (dLine*)malloc(sizeof(dLine));
-    lines->curr = lines->first = lines->last = NULL;
-    lines->size = 0;
-
-    return lines;
-}
 
 void insertLine(dLine **lines, int mode){
     int pos = 0;
@@ -98,6 +76,7 @@ void insertLine(dLine **lines, int mode){
     
     (*lines)->size ++;
     (*lines)->curr = _line;
+    insertChar(&(*lines)->curr, 0, LAST_CHAR);
 }
 
 int removeLine(dLine **lines, int mode){
@@ -175,66 +154,59 @@ void moveLineTo(dLine **lines, int mode){
         }
 }
 
-int isDLineEmpty(dLine *lines){
-    return lines == NULL || lines->size == 0;
-}
-
 line* newLine(){
     line* _line = (line*)malloc(sizeof(line));
     _line->prev = _line->next = NULL;
     _line->pos = 0;
-    _line->chars = newDCharac();
+    _line->chars = NULL;
     
     return _line;
 }
 
 void insertChar(line **_line, char character, int mode){
-    int pos = 0;
-    charac* _charac = newCharac();
-    _charac->value = character;
+    // int pos = 0;
+    // charac* _charac = newCharac();
+    // _charac->value = character;
 
-    if(isDCharacEmpty((*_line)->chars)){
-        (*_line)->chars->first = (*_line)->chars->last = (*_line)->chars->curr = _charac;
-    }else
-        switch (mode) {
-            case FIRST_CHAR:
-                _charac->next = (*_line)->chars->first;
-                _charac->next->prev = _charac;
-                (*_line)->chars->first = _charac;
-                break;
-            case LAST_CHAR:
-                _charac->prev = (*_line)->chars->last;
-                _charac->prev->next = _charac;
-                (*_line)->chars->last = _charac;
-                break;
-            case NEXT_CHAR:
-                if((*_line)->chars->curr->next != NULL){
-                    _charac->next = (*_line)->chars->curr->next;
-                    (*_line)->chars->curr->next->prev = _charac;
-                    _charac->prev = (*_line)->chars->curr;
-                    (*_line)->chars->curr->next = _charac;
-                }else{
-                    _charac->next = NULL;
-                    (*_line)->chars->last = _charac;
-                    _charac->prev = (*_line)->chars->curr;
-                    (*_line)->chars->curr->next = _charac;
-                }
-                break;
-            case PREV_CHAR:
-                if((*_line)->chars->curr->prev != NULL){
-                    _charac->prev = (*_line)->chars->curr->prev;
-                    (*_line)->chars->curr->prev->next = _charac;
-                    _charac->next = (*_line)->chars->curr;
-                    (*_line)->chars->curr->prev = _charac;
-                }else{
-                    _charac->prev = (*_line)->chars->curr->prev;
-                    (*_line)->chars->first = _charac;
-                    _charac->next = (*_line)->chars->curr;
-                    (*_line)->chars->curr->prev = _charac;
-                }
-        }
-    (*_line)->chars->size++;
-    (*_line)->chars->curr = _charac;
+    // if(isDCharacEmpty((*_line)->chars)){
+    //     (*_line)->chars->first = (*_line)->chars->curr = (*_line)->chars->last = _charac;
+    // }
+    // else if((*_line)->chars->size == 1){
+    //     (*_line)->chars->first = _charac;
+    //     (*_line)->chars->last->prev = _charac;
+    //     (*_line)->chars->curr = (*_line)->chars->last;
+    // }else
+    //     switch (mode) {
+            
+    //         case LAST_CHAR:
+    //             _charac->prev = (*_line)->chars->last;
+    //             _charac->prev->next = _charac;
+    //             (*_line)->chars->last = _charac;
+    //             break;
+    //         case NEXT_CHAR:
+    //             if((*_line)->chars->curr == (*_line)->chars->last){     // É O ÚLTIMO
+    //                 _charac->next = (*_line)->chars->last;
+    //                 (*_line)->chars->last->prev->next = _charac;
+    //                 _charac->prev = (*_line)->chars->last->prev->prev;
+    //                 (*_line)->chars->last->prev = _charac;
+                    
+    //             }else{                   
+    //                 if((*_line)->chars->curr == NULL){                                                        
+    //                     _charac->next = (*_line)->chars->first;
+    //                     (*_line)->chars->first->next->prev = _charac;
+    //                     _charac->prev = NULL;
+    //                     (*_line)->chars->first = _charac;
+    //                 }else{
+    //                     _charac->next = (*_line)->chars->curr->next;
+    //                     (*_line)->chars->curr->next->prev = _charac;
+    //                     _charac->prev = (*_line)->chars->curr;
+    //                     (*_line)->chars->curr->next = _charac;
+    //                 }
+    //             }
+    //             break;
+    //     }
+    // (*_line)->chars->size++;
+    // (*_line)->chars->curr = _charac;
 }
 
 void showLines(dLine *lines){
@@ -269,19 +241,17 @@ char removeChar(dLine **_lines, int mode){
             if((*_lines)->curr->chars->size == 1){ //SE CARAC É O ÚNICO
                 (*_lines)->curr->chars = newDCharac();
                 (*_lines)->curr->chars->size++;
-            }else if(aux == (*_lines)->curr->chars->first){ //SE O CARAC É O PRIMEIRO
-                aux->next->prev = NULL;
-                (*_lines)->curr->chars->first = aux->next;
-                (*_lines)->curr->chars->curr = aux->next;
             }else if(aux == (*_lines)->curr->chars->last){ //SE O CARAC É O ÚLTIMO
                 aux->prev->next = NULL;
                 (*_lines)->curr->chars->last = aux->prev;
                 (*_lines)->curr->chars->curr = aux->prev;
-            }else{
+            }else if(aux != (*_lines)->curr->chars->first){
                 aux->prev->next = aux->next;
                 aux->next->prev = aux->prev;
-                (*_lines)->curr->chars->curr = aux->next;
+                (*_lines)->curr->chars->curr = aux->prev;
             }
+            break;
+        case PREV_CHAR:
             break;
     }
 

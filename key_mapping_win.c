@@ -1,11 +1,11 @@
-void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, int **typed){
+void triggerKey(dLine **lines, char tecla, int **exit, int **typed){
     switch (tecla) {
         case 13:
             insertLine(lines, NEXT_LINE);
             **typed = 1;
         break;
         case 8:
-            removeChar(lines, CURR_CHAR);
+            removeChar(lines, PREV_CHAR);
             **typed = 1;
         break;
         default:

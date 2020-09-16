@@ -1,9 +1,8 @@
-//#include <curses.h>
-#include <curses.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "src/line.h"
+#include "src/file.h"
+#define VERSION "2.0"
 #include "interface.c"
 
 #ifdef __linux__ 
@@ -18,30 +17,22 @@ int main(){
     dLine* lines;
     int mode;
     int *exit;
-    int *curX, *curY;
     int *typed;
 
-    curX = (int*)malloc(sizeof(int));
-    curY = (int*)malloc(sizeof(int));
     exit = (int*)malloc(sizeof(int));
     typed = (int*)malloc(sizeof(int));
-
-
-    *curX = MIN_XCURSOR;
-    *curY = MIN_YCURSOR;
 
     initconio();
     
     frame();
 
-    lines = newDLine();
-    insertLine(&lines, FIRST_LINE);
+    file* f = newFile();
 
     do{
-        triggerKey(&lines, getch(), &exit, &curX, &curY, &typed);
+        triggerKey(&lines, getch(), &exit, &typed);
 
-        showEditor(lines, top, &curX, &curY, *typed);
-        gotoxy(40, 2);printw("Curr char_: %c", lines->curr->chars->curr->value);
+        showEditor(lines, *typed);
+        
     }while(!*exit);
 
     endwin();
