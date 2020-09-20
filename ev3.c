@@ -1,31 +1,31 @@
+#define VERSION "3.0"
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "src/cursor.h"
+#include "interface.c"
 
 int main(){
     linha *linhas = newLinha();
     cursor *atual;
+    int *exit = (int*)malloc(sizeof(int)), *topo =(int*)malloc(sizeof(int));
     addLinha(&linhas);
+  //  topo=0;
 
     atual = newCursor(&linhas, &linhas->caracs);
 
-    addCarac(atual->aCarac, 'a');
-    moveCarac(&atual, PROX);
-    addCarac(atual->aCarac, 'c');
-    moveCarac(&atual, PROX);
-    addCarac(atual->aCarac, 'b');
+    initconio();
+    frame();
+    menuInicial();
 
-    addLinha(atual->aLinha);
-    moveLinha(&atual, PROX);
-    addCarac(atual->aCarac, 'd');
+    do{
+        showEditor(linhas, atual, *topo);
+        triggerKey(&linhas, &atual, &exit, &topo);
+    }while(!*exit);
 
-    addLinha(atual->aLinha);
-    moveLinha(&atual, PROX);
-    addCarac(atual->aCarac, 'e');
-    moveCarac(&atual, ANTE);
-    addCarac(atual->aCarac, 'f');
-
-    showLinha(linhas);
+    getch();
+    endconio();
 
     return 0;
 }

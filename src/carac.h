@@ -1,4 +1,3 @@
-#include <stdio.h>
 struct carac{
     struct carac *ant, *prox;
     char valor;
@@ -7,6 +6,7 @@ typedef struct carac carac;
 
 carac *newCarac();
 void addCarac(carac**, char);
+int removeCarac(carac **);
 
 carac *newCarac(){
     carac *c = (carac*)malloc(sizeof(carac));
@@ -39,8 +39,33 @@ void addCarac(carac **anterior, char valor){
     }
 }
 
-void showCarac(carac *c){
+int removeCarac(carac **remover){
+    carac *aux = *remover;
+    if((*remover)->valor == 0) //LINHA VAZIA
+        return -1;
+
+    if((*remover)->ant == NULL && (*remover)->prox->valor == 0) //QUANDO É O ÚNICO CARACTER DA LINHA
+        (*remover) = (*remover)->prox;
+    else{
+        if((*remover)->prox->valor == 0)
+            (*remover)->ant->prox = (*remover)->prox;
+        else{
+            if((*remover)->ant == NULL){
+                (*remover)->prox->ant = NULL;
+                (*remover) = (*remover)->prox;
+            }else{
+                (*remover)->ant->prox = (*remover)->prox;
+                (*remover)->prox->ant = (*remover)->ant;
+            }
+        }
+    }
+
+    free(aux);
+    return 1;
+}
+
+void debugCarac(carac *c){
     printf("%c", c->valor);
     if(c->valor != 0)
-        showCarac(c->prox);
+        debugCarac(c->prox);
 }

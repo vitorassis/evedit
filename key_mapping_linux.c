@@ -1,5 +1,7 @@
-#include <curses.h>
-void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, int **typed){
+void triggerKey(linha **linhas, cursor **atual, int **exit, int **topo){
+    carac *antCar;
+    linha *antLin;
+    char tecla = getch();
     switch (tecla) {
         case 27:    //TECLAS ESPECIAIS LINUX
             switch (getch()) {
@@ -20,16 +22,14 @@ void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, i
                             //pgup func
                         break;
                         case 66: //SETA P BAIXO
-                            setYCursor(lines, curX, curY, SETCUR_NEXT);
+                            moveLinha(atual, PROX);
                         break;
                         case 65: //SETA P CIMA
-                            setYCursor(lines, curX, curY, SETCUR_PREV);
+                            moveLinha(atual, ANTE);
                         break;
                         case 68: //SETA P ESQUERDA
-                            gotoxy(1, 22);printw("s: %d", (*curY)++);
-                            setXCursor(lines, curX, curY, SETCUR_PREV);
+                            moveCarac(atual, ANTE);
                     }
-                    **typed = 0;
                 break;               
                 case 79:    //FN KEYS
                     switch (getch()) {
@@ -40,18 +40,25 @@ void triggerKey(dLine **lines, char tecla, int **exit, int **curX, int **curY, i
                     
                 break;             
             }
-            **typed = 0;
         break;
         case 10:
-            insertLine(lines, NEXT_LINE);
-            **typed = 1;
+            addLinha((*atual)->aLinha);
+            moveLinha(atual, PROX);
         break;
         case 127:
-            removeChar(lines, CURR_CHAR);
-            **typed = 1;
+            if((*(*atual)->aCarac)->valor != 0){
+                antCar = (*(*atual)->aCarac)->ant;
+                removeCarac((*atual)->aCarac);
+                (*atual)->aCarac = &antCar;
+            }else {            
+                antLin = (*(*atual)->aLinha)->ant;
+                removeLinha((*atual)->aLinha); 
+                (*atual)->aLinha = &antLin;
+                (*atual)->aCarac = &(*(*atual)->aLinha)->caracs;
+            }
         break;
         default:
-            insertChar(&((*lines)->curr), tecla, NEXT_CHAR);
-            **typed = 1;
+            addCarac((*atual)->aCarac, tecla);
+            moveCarac(atual, PROX);
     }
 }

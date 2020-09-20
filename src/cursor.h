@@ -75,3 +75,4 @@ void moveLinha(cursor **cu, int modo){
     for(i = 0; i<nPosLinhaAnt; i++)
         moveCarac(cu, modo);
 }
+
